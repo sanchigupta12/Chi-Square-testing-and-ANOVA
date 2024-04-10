@@ -1,0 +1,1168 @@
+---
+title: 'Module 2: Chi-Square testing and ANOVA'
+author: "Sanchi Gupta, ALY6015 Intermediate Analytics"
+output:
+  word_document: default
+  html_document:
+    df_print: paged
+editor_options: 
+  markdown: 
+    wrap: 72
+---
+
+# Introduction:
+
+In this module, we delve into the application of Chi-Square testing and
+ANOVA (Analysis of Variance), two pivotal statistical tools, to assess
+various hypotheses in different real-world scenarios. Chi-Square tests
+are employed to compare observed frequencies with expected frequencies
+and are instrumental in determining whether there are significant
+differences between categorical variables. ANOVA, on the other hand, is
+used to compare the means of three or more groups to ascertain if at
+least one group mean is statistically different from the others. Through
+the tasks presented in this module, we aim to provide practical insights
+into how these statistical methods can be applied to data samples from
+the healthcare sector, transportation industry, entertainment, and
+military service to draw meaningful conclusions.
+
+------------------------------------------------------------------------
+
+# Task 1 (Section 11-1 6. Blood Types)
+
+A medical researcher wishes to see if hospital patients in a large
+hospital have the same blood type distribution as those in the general
+population. The distribution for the general population is as follows:
+
+-   type A = 20%
+
+-   type B = 28%
+
+-   type O = 36%
+
+-   type AB = 16%
+
+He selects a random sample of 50 patients and finds the following:
+
+-   12 have type A blood
+
+-   8 have type B
+
+-   24 have type O
+
+-   6 have type AB blood
+
+At α = 0.10, can it be concluded that the distribution is the same as
+that of the general population?
+
+# Solution
+
+## $\chi^2$ Test
+
+Forming of vectors of $expected$ probabilities and $observed$
+frequencies, then we run the test afterwards.
+
+```{r}
+# Observed frequencies in the hospital sample
+observed_1 <- c(12, 8, 24, 6)
+
+# Expected frequencies based on the general population distribution
+expected_1 <- c(0.20 * 50, 0.28 * 50, 0.36 * 50, 0.16 * 50)
+
+# alpha
+alpha_0.10 <- 0.10
+
+```
+
+### Step 1. Stating the hypotheses and identifying the claim
+
+The hypothesis for the above will be as follow:
+
+**Null Hypothesis** = The distribution of blood types in hospital
+patients is the same as that of the general population.
+
+**Alternative Hypothesis** = The distribution of blood types in hospital
+patients is different from that of the general population.
+
+### Step 2. Finding the critical value
+
+When using the p-value for analysis, no critical value is needed.
+Because of this, we will use the provided p-value and omit this step.
+
+### Step 3. Computing the test results
+
+```{r}
+
+# Chi-square test
+chi_square_1 <- chisq.test(observed_1, p = expected_1 / sum(expected_1))
+
+# Print the test results
+print(chi_square_1)
+
+```
+
+### Step 4. Analyzing the results
+
+**Interpretation:**
+
+-   If the p-value is less than the significance level (α = 0.10), then
+    we would reject the null hypothesis. In this case, the p-value is
+    0.1404, which is greater than alpha = 0.10.
+
+### Step 5. Summary
+
+Therefore, based on the p-value, we would fail to reject the null
+hypothesis. There is not enough evidence to conclude that the
+distribution of blood types in hospital patients is different from that
+of the general population at a significance level of 0.10.
+
+[**The evidence leads us to not reject the null
+hypothesis.**]{.underline}
+
+------------------------------------------------------------------------
+
+# Task 2 (Section 11-1. 8. On-Time Performance by Airlines)
+
+According to the Bureau of Transportation Statistics, on-time
+performance by the airlines is described as follows:
+
+| Action                                          | **% of Time** |
+|-------------------------------------------------|---------------|
+| On-time                                         | 70.8          |
+| National Aviation System delay                  | 8.2           |
+| Aircraft arriving late                          | 9.0           |
+| Other (because of weather and other conditions) | 12.0          |
+
+Records of 200 randomly selected flights for a major airline company
+showed that
+
+-   125 planes were on time
+
+-   40 were delayed because of weather
+
+-   10 because of a National Aviation System delay
+
+-   25 because of arriving late
+
+At α = 0.05, do these results differ from the government's statistics?
+
+*Source:* www.transtats.bts.gov
+
+# Solution
+
+## $\chi^2$ Test
+
+Forming of vectors of \$expected\$ probabilities and \$observed\$
+frequencies, then we run the test afterwards.
+
+```{r}
+# Observed frequencies
+observed_2 <- c(125, 10, 40, 200 - (125 + 10 + 40))
+
+# Expected frequencies based on the given percentages
+expected_2 <- c(0.708 * 200, 0.082 * 200, 0.090 * 200, 0.120 * 200)
+
+```
+
+### Step 1. Stating the hypotheses and identify the claim
+
+The hypothesis for the above will be as follow:
+
+**Null Hypothesis** = The distribution of on-time performance categories
+for the airline is consistent with the expected distribution provided by
+the Bureau of Transportation Statistics.
+
+**Alternative Hypothesis** = There is a significant difference in the
+distribution of on-time performance categories for the airline compared
+to the expected distribution provided by the Bureau of Transportation
+Statistics.
+
+### Step 2. Finding the critical value
+
+When using the p-value for analysis, no critical value is needed.
+Because of this, we will use the provided p-value and omit this step.
+
+### Step 3. Computing the test results
+
+```{r}
+# to set the results to numerical digits
+options(scipen = 100, digits = 10)
+
+# Chi-square test
+chi_square_2 <- chisq.test(observed_2, p = expected_2 / sum(expected_2))
+
+# Print the test results
+print(chi_square_2)
+
+options(scipen = 100, digits = 10)
+```
+
+### Step 4. Analyzing the results
+
+**Interpretation:**
+
+-   If the p-value is less than the significance level (α = 0.05), we
+    would reject the null hypothesis. In this case, the p-value is
+    0.0000007090023, which is far less than alpha = 0.05.
+
+### Step 5. Summary
+
+Therefore, based on the extremely small p-value, we would reject the
+null hypothesis. There is strong evidence to conclude that there is a
+significant difference in the distribution of on-time performance
+categories for the airline compared to the expected distribution
+provided by the Bureau of Transportation Statistics at a significance
+level of 0.05.
+
+[**The evidence leads us to reject the null hypothesis.**]{.underline}
+
+------------------------------------------------------------------------
+
+# Task 3 (Section 11-2.8. Ethnicity and Movie Admissions)
+
+Are movie admissions related to ethnicity? A 2014 study indicated the
+following numbers of admissions (in thousands) for two different years.
+At the 0.05 significance level, can it be concluded that movie
+attendance by year depended on ethnicity?
+
+|      | **Caucasian** | **Hispanic** | **African American** | **Other** |
+|------|---------------|--------------|----------------------|-----------|
+| 2013 | 724           | 335          | 174                  | 107       |
+| 2014 | 370           | 292          | 152                  | 140       |
+
+*Source: MPAA Study*.
+
+# Solution
+
+## $\chi^2$ Test
+
+```{r}
+# Create vectors for the observed frequencies
+observed_2013 <- c(724, 335, 174, 107)
+observed_2014 <- c(370, 292, 152, 140)
+
+# Combine the vectors into a matrix
+movie_matrix_3 <- rbind(observed_2013, observed_2014)
+
+```
+
+### Step 1. Stating the hypotheses and identify the claim
+
+The hypothesis for the above will be as follow:
+
+**Null Hypothesis** = There is no association between movie attendance
+and ethnicity. In other words, movie attendance is independent of
+ethnicity.
+
+**Alternative Hypothesis** = There is a significant association between
+movie attendance and ethnicity. Movie attendance is not independent of
+ethnicity.
+
+### Step 2. Finding the critical value
+
+When using the p-value for analysis, no critical value is needed.
+Because of this, we will use the provided p-value and omit this step.
+
+### Step 3. Computing the test results
+
+```{r}
+
+# Perform chi-square test for independence
+chi_square_3 <- chisq.test(movie_matrix_3)
+
+# Print the test results
+print(chi_square_3)
+
+```
+
+### Step 4. Analyzing the results
+
+**Interpretation:**
+
+-   If the p-value is less than the significance level (α = 0.05), then
+    we would reject the null hypothesis. Here, the p-value is
+    0.0000000000005477507, which is again less than alpha = 0.05.
+
+### Step 5. Summary
+
+We created a matrix since the chi-square test for independence was
+necessary. The contingency table structure helps in data organization
+and analysis because there are two variables in these situations.
+
+Therefore, based on the extremely small p-value, we would reject the
+null hypothesis. There is strong evidence to conclude that movie
+attendance depends on ethnicity at a significance level of 0.05.
+
+[**The evidence leads us to reject the null hypothesis.**]{.underline}
+
+------------------------------------------------------------------------
+
+# Task 4 (Section11-2.10 Women in the Military)
+
+This table lists the numbers of officers and enlisted personnel for
+women in the military. At *α* = 0.05, is there sufficient evidence to
+conclude that a relationship exists between rank and branch of the Armed
+Forces?
+
+![](images/Screenshot%202024-01-19%20at%209.33.59%20PM.png){width="348"}
+
+*Source:* *New York Times Almanac*.
+
+# Solution
+
+## $\chi^2$ Test
+
+```{r}
+
+# Observed frequencies
+army <- c(10791, 62491)
+navy <- c(7816, 42750)
+marine_corps <- c(932, 9525)
+air_force <- c(11819, 54344)
+
+# Combine the vectors into a matrix
+military_matrix_4 <- rbind(army, navy, marine_corps, air_force)
+
+```
+
+### Step 1. Stating the hypotheses and identify the claim
+
+The hypothesis for the above will be as follow:
+
+**Null Hypothesis** = There is no relationship between the rank
+(officers or enlisted) and the branch of the Armed Forces for women. In
+other words, the distribution of officers and enlisted personnel is
+independent of the branch.
+
+**Alternative Hypothesis** = There is a relationship between the rank
+(officers or enlisted) and the branch of the Armed Forces for women. The
+distribution of officers and enlisted personnel is not independent of
+the branch.
+
+### Step 2. Finding the critical value
+
+When using the p-value for analysis, no critical value is needed.
+Because of this, we will use the provided p-value and omit this step.
+
+### Step 3. Computing the test results
+
+```{r}
+# Perform chi-square test for independence
+chi_square_4 <- chisq.test(military_matrix_4)
+
+# Print the test results
+print(chi_square_4)
+```
+
+### Step 4. Analyzing the results
+
+**Interpretation:**
+
+-   The p-value associated with the chi-square test statistic is less
+    than alpha=0.05, which is extremely small. Since this p-value is
+    significantly less than the common alpha level of 0.05, it suggests
+    that the observed data are highly unlikely to have occurred by
+    random chance if the null hypothesis were true.
+
+### Step 5. Summary
+
+Therefore, based on the extremely small p-value, we would reject the
+null hypothesis. There is strong evidence to conclude that there is a
+significant relationship between the rank (officers or enlisted) and the
+branch of the Armed Forces for women. This suggests that the proportions
+of officers and enlisted personnel vary across different branches,
+indicating dependence between rank and branch in the military for women.
+
+[**The evidence leads us to reject the null hypothesis.**]{.underline}
+
+------------------------------------------------------------------------
+
+# Task 5 (Section 12-1.8 Sodium Contents of Foods)
+
+Perform a complete one-way ANOVA. If the null hypothesis is rejected,
+use either the Scheffé or Tukeytest to see if there is a significant
+difference in the pairs of means. Assume all assumptions are met.
+
+The amount of sodium (in milligrams) in one serving for a random sample
+of three different kinds of foodsis listed. At the 0.05 significance
+level, is there sufficient evidence to conclude that a difference in
+mean sodium amounts exists among condiments, cereals, and desserts?
+
+| Condiments | Cereals | Desserts |
+|------------|---------|----------|
+| 270        | 260     | 100      |
+| 130        | 220     | 180      |
+| 230        | 290     | 250      |
+| 180        | 290     | 250      |
+| 80         | 200     | 300      |
+| 70         | 320     | 360      |
+| 200        | 140     | 300      |
+|            |         | 160      |
+
+: Source: The Doctor's Pocket Calorie, Fat, and Carbohydrate Counter
+
+# Solution
+
+## ANOVA Test
+
+```{r}
+
+# Sodium amounts for three different kinds of foods
+condiments <- c(270,130,230,180,80,70,200)
+cereals    <- c(260,220,290,290,200,320,140)
+desserts   <- c(100,180,250,250,300,360,300,160)
+
+sample_5 <- matrix(c(rep("Condiments", 7), rep("Cereals", 7), rep("Desserts", 8), condiments , 
+                  cereals, desserts),ncol=2)
+
+df_5 <- data.frame(sample_5)
+
+names(df_5) <- c('food_type', 'sodium_milligrams')
+
+```
+
+### Step 1. Stating the hypotheses and identify the claim
+
+The hypothesis for the above will be as follow:
+
+**Null Hypothesis** = The population means for sodium are equal across
+all three categories.
+
+**Alternative Hypothesis** = There is a significant difference in the
+mean sodium amounts among condiments, cereals, and desserts. At least
+one population mean is different from the others.
+
+### Step 2. Finding the critical value
+
+When using the p-value for analysis, no critical value is needed.
+Because of this, we will use the provided p-value and omit this step.
+
+### Step 3. Computing the test results
+
+```{r}
+# Perform one-way ANOVA
+anova_result_5 <- aov(as.numeric(sodium_milligrams)~food_type, data=df_5)
+
+# Print the ANOVA summary
+summary(anova_result_5)
+```
+
+### Step 4. Analyzing the results
+
+**Interpretation:**
+
+-   The p-value associated with the F-statistic tests the null
+    hypothesis that there is no difference in means among the groups. If
+    this p-value is less than the significance level (commonly 0.05), we
+    would reject the null hypothesis. In this case, the p-value for
+    "food_type" is 0.11781, which is greater than 0.05.
+
+### Step 5. Summary
+
+Therefore, at a 0.05 significance level, there is not sufficient
+evidence to conclude that a difference in mean sodium amounts exists
+among condiments, cereals, and desserts.
+
+[**The evidence leads us to not reject the null
+hypothesis.**]{.underline}
+
+------------------------------------------------------------------------
+
+# Task 6 (Section 12-2.10 Sales for Leading Companies)
+
+Perform a complete one-way ANOVA. If the null hypothesis is rejected,
+use either the Scheffé or Tukeytest to see if there is a significant
+difference in the pairs of means. Assume all assumptions are met.
+
+The sales in millions of dollars for a year of a sample of leading
+companies are shown. At α = 0.01, isthere a significant difference in
+the means?
+
+|            |                     |            |
+|------------|---------------------|------------|
+| **Cereal** | **Chocolate Candy** | **Coffee** |
+| 578        | 311                 | 261        |
+| 320        | 106                 | 185        |
+| 264        | 109                 | 302        |
+| 249        | 125                 | 689        |
+| 237        | 173                 |            |
+
+: Source: Information Resources, Inc.
+
+# Solution
+
+## ANOVA Test
+
+```{r}
+
+# Sales data for different products
+cereal  <- c(578, 320, 264, 249,237)
+candy   <- c(311, 106, 109, 125,173)
+coffee  <- c(261, 185, 302,689)
+
+
+sample_6 <- matrix(c(rep("Cereal", 5), rep("Candy", 5), rep("Coffee", 4), cereal , 
+                  candy, coffee),ncol=2)
+
+df_6 <- data.frame(sample_6)
+
+names(df_6) <- c('Sample_Type', 'Sales_in_million_dollars')
+
+```
+
+### Step 1. Stating the hypotheses and identify the claim
+
+The hypothesis for the above will be as follow:
+
+**Null Hypothesis** = The population means for sales are equal across
+all four product categories.
+
+**Alternative Hypothesis** = There is a significant difference in the
+mean sales among chocolate, cereal, candy, and coffee. At least one
+population mean is different from the others.
+
+### Step 2. Finding the critical value
+
+When using the p-value for analysis, no critical value is needed.
+Because of this, we will use the provided p-value and omit this step.
+
+### Step 3. Computing the test results
+
+```{r}
+# Perform one-way ANOVA
+anova_result_6 <- aov(as.numeric(Sales_in_million_dollars)~Sample_Type, data=df_6)
+
+# Print the ANOVA summary
+summary(anova_result_6)
+```
+
+### Step 4. Analyzing the results
+
+**Interpretation:**
+
+-   The p-value associated with the F-statistic tests the null
+    hypothesis that there is no difference in means among the groups. If
+    this p-value is less than the significance level = 0.01, we would
+    reject the null hypothesis. In this case, the p-value for
+    "Sample_Type" is 0.16035, which is greater than 0.01.
+
+### Step 5. Summary
+
+Therefore, at a 0.01 significance level, there is not sufficient
+evidence to conclude that a significant difference in mean sales exists
+among chocolate, cereal, and candy. The null hypothesis that all
+population means are equal is not rejected.
+
+[**The evidence leads us to not reject the null
+hypothesis.**]{.underline}
+
+------------------------------------------------------------------------
+
+# Task 7 (Section 12-2.12 Per-Pupil Expenditures)
+
+Perform a complete one-way ANOVA. If the null hypothesis is rejected,
+use either the Scheffé or Tukeytest to see if there is a significant
+difference in the pairs of means. Assume all assumptions are met.
+
+The expenditures (in dollars) per pupil for states in three sections of
+the country are listed. Using α =0.05, can you conclude that there is a
+difference in means?
+
+| Eastern Third | Middle Third | Western Third |
+|---------------|--------------|---------------|
+| 4946          | 6149         | 5282          |
+| 5953          | 7451         | 8605          |
+| 6202          | 6000         | 6528          |
+| 7243          | 6479         | 6911          |
+| 6113          |              |               |
+
+: Source: New York Times Almanac
+
+# Solution
+
+## ANOVA Test
+
+```{r}
+
+# Expenditures data for different sections of the country
+eastern        <- c(4946,5953,6202,7243,6113)
+middle         <- c(6149,7451,6000,6479)
+western        <- c(5282,8605,6528,6911)
+
+sample_7 <- matrix(c(rep("eastern", 5), rep("middle", 4), rep("western", 4), eastern , 
+                  middle, western),ncol=2)
+
+# Convert the matrix to a data frame for easier analysis
+df_7 <- data.frame(sample_7)
+
+names(df_7) <- c('country_section', 'expenditure_dollars_per_pupil')
+```
+
+### Step 1. Stating the hypotheses and identify the claim
+
+The hypothesis for the above will be as follow:
+
+**Null Hypothesis** = The population means for expenditures are equal
+across all three sections.
+
+**Alternative Hypothesis** = There is a significant difference in the
+mean expenditures per pupil among the Eastern Third, Middle Third, and
+Western Third sections of the country. At least one population mean is
+different from the others.
+
+### Step 2. Finding the critical value
+
+When using the p-value for analysis, no critical value is needed.
+Because of this, we will use the provided p-value and omit this step.
+
+### Step 3. Computing the test results
+
+```{r}
+# Perform one-way ANOVA
+anova_result_7 <- aov(as.numeric(expenditure_dollars_per_pupil)~country_section, data=df_7)
+
+# Print the ANOVA summary
+summary(anova_result_7)
+```
+
+### Step 4. Analyzing the results
+
+**Interpretation:**
+
+-   The p-value associated with the F-statistic tests the null
+    hypothesis that there is no difference in means among the groups. If
+    this p-value is greater than the significance level (commonly 0.05),
+    we would fail to reject the null hypothesis. In this case, the
+    p-value for "country_section" is 0.54333, which is greater than
+    0.05.
+
+### Step 5. Summary
+
+Therefore, at a 0.05 significance level, there is not sufficient
+evidence to conclude that a significant difference in mean expenditures
+per pupil exists among the Eastern Third, Middle Third, and Western
+Third sections of the country. The null hypothesis that all population
+means are equal is not rejected.
+
+[**The evidence leads us to not reject the null
+hypothesis.**]{.underline}
+
+------------------------------------------------------------------------
+
+# Task 8 (Section 12-3.10 Increasing Plant Growth)
+
+A gardening company is testing new ways to improve plant growth. Twelve
+plants are randomly selected and exposed to a combination of two
+factors:
+
+• a "Grow-light" in two different strengths.
+
+• a plant food supplement with different mineral supplements.
+
+After several days, the plants are measured for growth, and the results
+(in inches) are put into the appropriate boxes.
+
+|              | Grow Light 1  | Grow Light 2  |
+|--------------|---------------|---------------|
+| Plant Food A | 9.2, 9.4, 8.9 | 8.5, 9.2, 8.9 |
+| Plant Food B | 7.1, 7.2, 8.5 | 5.5, 5.8, 7.6 |
+
+# Solution
+
+## Two-way ANOVA Test
+
+```{r}
+
+# Growth data
+grow_light_1_food_A <- c(9.2, 9.4, 8.9)
+grow_light_2_food_A <- c(8.5, 9.2, 8.9)
+grow_light_1_food_B <- c(7.1, 7.2, 8.5)
+grow_light_2_food_B <- c(5.5, 5.8, 7.6)
+
+# Create a matrix for plant growth data
+sample_8 <- matrix(c(rep("grow_light_1", 6), rep("grow_light_2", 6), rep("food_A", 3), rep("food_B", 3), rep("food_A", 3), rep("food_B", 3) , grow_light_1_food_A , grow_light_1_food_B, grow_light_2_food_A , grow_light_2_food_B ),ncol=3)
+
+# Convert the matrix to a data frame for easier analysis
+df_8 <- data.frame(sample_8)
+
+names(df_8) <- c('grow_light', 'food', 'improvements')
+```
+
+### Step 1. Stating the hypotheses and identify the claim
+
+The hypothesis for the above will be as follow:
+
+**Null Hypothesis** =
+
+1.  There is no interaction between the two factors (Grow-light and
+    Plant food) in affecting plant growth.
+
+2.  There is no difference in mean growth with respect to light
+    (Grow-light).
+
+3.  There is no difference in mean growth with respect to plant food.
+
+**Alternative Hypothesis** =
+
+1.  There is an interaction between the two factors (Grow-light and
+    Plant food) in affecting plant growth.
+
+2.  There is a difference in mean growth with respect to light
+    (Grow-light).
+
+3.  There is a difference in mean growth with respect to plant food.
+
+### Step 2. Finding the critical value
+
+```{r}
+alpha <- 0.05
+
+# Degrees of freedom
+dof1 <- 1  # for both main effects (grow light and plant food)
+dof2 <- 8  # total observations minus the number of levels
+
+# Critical value for grow light
+critical_value_grow_light <- qf(1 - alpha, dof1, dof2)
+
+# Critical value for plant food
+critical_value_plant_food <- qf(1 - alpha, dof1, dof2)
+
+critical_value_grow_light
+critical_value_plant_food
+
+```
+
+### Step 3. Computing the test results
+
+```{r}
+# Perform a two-way ANOVA
+anova_result_8 <- aov(improvements ~ grow_light * food, data = df_8)
+# (OpenAI, 2024)
+# (F. E. (2020, July 30))
+
+# Print the ANOVA summary
+summary(anova_result_8)
+```
+
+### Step 4. Analyzing the results
+
+**Interpretation:**
+
+-   **grow_light**:
+
+    -   **F value**: 3.68051
+
+    -   Since 3.68051 is less than the critical value of 5.318, the
+        effect of grow light strength on plant growth is not
+        statistically significant at the 0.05 level.
+
+-   **food (Plant Food)**:
+
+    -   **F value**: 24.56230
+
+    -   Since 24.56230 is greater than the critical value of 5.318, the
+        effect of plant food supplement on plant growth is statistically
+        significant at the 0.05 level.
+
+-   **grow_light:food (Interaction between Grow Light and Food)**:
+
+    -   **F value**: 1.43770
+
+    -   Since 1.43770 is less than the critical value of 5.318, the
+        interaction between grow light strength and plant food type does
+        not significantly affect plant growth at the 0.05 level.
+
+### Step 5. Summary
+
+In summary, based on the critical F value (5.318), only the type of
+plant food supplement (food) has a significant impact on plant growth.
+Neither the grow light strength nor the interaction between grow light
+strength and plant food type shows a significant effect.
+
+The type of plant food supplement significantly affects plant growth,
+while the grow light strength and the interaction between grow light
+strength and plant food type do not have a significant effect at the
+0.05 level.
+
+------------------------------------------------------------------------
+
+# Task 9
+
+# Solution
+
+### 9.1 Importing the dataset
+
+```{r}
+# Importing libraries
+library(ggplot2)
+library(dplyr)
+library(corrplot)
+library(tibble)
+
+# Loading the data
+baseball <- read.csv('baseball-3.csv')
+
+```
+
+### 9.2 Exploratory Data Analysis
+
+#### a. Descriptive Statistics
+
+```{r}
+# Summary statistics
+summary(baseball)
+
+```
+
+This summarizes the data types for each column in the dataset. It also
+provides us the data type for each variable along with mean for the
+numerical columns.
+
+#### b. Graphical Representation
+
+**Plot 1: Histogram of wins**
+
+```{r}
+# Plotting histogram for the Wins
+hist(baseball$W,
+     main = "Histogram of Wins",
+     xlab = "Wins",
+     col = "lightblue",
+     border = "black")
+
+# Adding title below the plot
+mtext("Plot 1: Histogram of Wins", side = 1, line = 4, cex = 0.8)
+```
+
+**Interpretation of Plot 1: Histogram of Wins**
+
+This histogram gives a visual representation of the distribution of
+wins. The horizontal axis represents each bin as a range of wins. The
+vertical axis shows the frequency, which is the number of occurrences
+within each bin. The histogram have the highest frequency in the central
+bins and lower frequencies in the bins on either end, suggesting a
+roughly symmetric distribution around the center. This indicates a
+normal distribution. Most teams or individuals have a number of wins
+that cluster around the middle range, with fewer teams having very low
+or very high numbers of wins.
+
+------------------------------------------------------------------------
+
+**Plot 2: Correlation Matrix**
+
+```{r}
+# Correlation matrix for numeric variables
+numeric_extract <- baseball %>% select(Year, RS, RA, W, OBP, SLG, BA, RankSeason, RankPlayoffs, G, OOBP, OSLG)
+
+# Calculating correlation matrix
+correlation_table <- cor(numeric_extract, use = "complete.obs")
+
+```
+
+```{r}
+# Plotting correlation matrix
+corrplot(correlation_table, 
+         method = "color",
+         type = "upper",
+         tl.col = "black",
+         tl.srt = 45,
+         tl.cex = 0.75,
+         addrect = 4,
+         title = "Correlation Heatmap")
+
+# Adding title below the plot
+mtext("Plot 2 - Correlation Matrix Heatmap for Numeric Variables", side = 1, line = 4, cex = 0.8)
+```
+
+**Interpretation of Plot 2: Correlation Matrix Heatmap for Numeric
+Variables**
+
+**Variable Names**: Along the axes, "Year," "RS," "RA," "W," "OBP,"
+"SLG," "BA," "RankSeason," "RankPlayoffs," "G," "OOBP," and "OSLG" are
+likely abbreviations for statistical categories.
+
+-   RS could be "Runs Scored"
+
+-   RA could be "Runs Allowed"
+
+-   W could be "Wins"
+
+-   OBP could be "On-base Percentage"
+
+-   SLG could be "Slugging Percentage"
+
+-   BA could be "Batting Average"
+
+-   G could be "Games Played"
+
+-   OOBP could be "Opponents' On-base Percentage"
+
+-   OSLG could be "Opponents' Slugging Percentage"
+
+**Color Scale**: There is a color scale on the side, with colors
+representing the strength and direction of the correlation. In the above
+heatmap darker blue indicates a stronger positive correlation, and
+darker red indicates a stronger negative correlation, with lighter
+colors or white indicating a weaker correlation.
+
+------------------------------------------------------------------------
+
+**Plot 3: Scatter plot with a linear regression line**
+
+```{r}
+# plotting scatter plot with a linear regression line
+ ggplot(baseball, aes(x = OBP, y = RS)) +
+  geom_point() +
+  geom_smooth(method = 'lm') +
+  labs(title = "Plot 3: Scatter plot with a linear regression line for Offensive Efficiency")
+
+```
+
+**Interpretation of Plot 3: Scatter plot with a linear regression line
+for Offensive Efficiency**
+
+The position of the dot corresponds to the OBP value for that
+observation on the horizontal axis and the RS value on the vertical
+axis. There appears to be a positive correlation between OBP and RS, as
+the dots show an upward trend from left to right. This suggests that
+higher on-base percentages tend to be associated with higher numbers of
+runs scored. The blue line represents a linear regression model that
+best fits the data. The positive slope of the line confirms the positive
+relationship between OBP and RS. This line can be used to predict RS
+from OBP.
+
+In conclusion, the scatter plot suggests a statistically significant and
+positive relationship between a team's or player's OBP and the number of
+runs they score, which is a key aspect of offensive efficiency in
+baseball.
+
+------------------------------------------------------------------------
+
+**Plot 4: Line plots for league averages of key statistics**
+
+```{r}
+# Plotting line plot
+ggplot(baseball, aes(x = Year, y = RS, group = League, color = League)) +
+  geom_line(stat = "summary", fun.y = "mean") +
+  labs(title = "Plot 4- Line plots for Average Runs Scored (RS) by League Over Years")
+```
+
+**Interpretation of Plot 4: Line plots for Average Runs Scored (RS) by
+League Over Years**
+
+The graph shows how the average runs scored have varied over the years
+in each league. There are two lines, one for each league (AL in red and
+NL in cyan). Each point on the line represents the average runs scored
+by the teams in that league for a given year. At various times, one line
+is above the other, indicating that in those years, one league had a
+higher average of runs scored than the other. Both leagues show a
+general upward trend in runs scored from the 1960s to the late
+1990s/early 2000s, after which there is a visible decline. It's also
+worth noting the difference in trends between the two leagues. For
+example, in the late 1990s and early 2000s, the AL shows a higher
+run-scoring average than the NL, which might be attributed to the use of
+the designated hitter (DH) rule, which is used in the AL but not in the
+NL.
+
+------------------------------------------------------------------------
+
+### 9.3 Chi-Square Goodness-of-Fit test
+
+Form the vectors of $expected$ probabilities and $observed$ frequencies,
+then run the test
+
+```{r}
+# Extract decade from year
+baseball$Decade <- baseball$Year - (baseball$Year %% 10)
+
+# Create a wins table by summing the wins by decade
+wins <- baseball %>%
+group_by(Decade) %>%
+summarize(wins = sum(W)) %>%
+as.tibble()
+
+number_of_decades <- length(unique(baseball$Decade))
+
+# Expected proportions for each decade
+expected_wins <- rep(1/number_of_decades, number_of_decades)
+
+```
+
+### Step 1. Stating the hypotheses and identifying the claim
+
+The hypothesis for the above will be as follow:
+
+**Null Hypothesis** = There is no difference in the number of wins by
+decade.
+
+**Alternative Hypothesis** = There is significant difference in the
+number of wins by decade.
+
+### Step 2. Finding the critical value
+
+```{r}
+# Finding the critical value at alpha=0.05
+critical_value_9.3 <- qchisq(p = 0.95, df = length(wins$wins) - 1)
+
+print(critical_value_9.3)
+```
+
+### Step 3. Computing the test results
+
+```{r}
+# Chi-square test
+chi_square_9.3<- chisq.test(x = wins$wins, p = expected_wins)
+
+# Print the result
+print(chi_square_9.3)
+```
+
+### Step 4. Analyzing the results
+
+**Interpretation:**
+
+-   When comparing the Chi-squared test statistic to the critical value:
+
+    -   If the test statistic is greater than the critical value,
+        wereject the null hypothesis.
+
+    -   If the test statistic is less than the critical value, we fail
+        to reject the null hypothesis
+
+-   Since test statistic (9989.5364) is much greater than the critical
+    value (11.07049769), we reject the null hypothesis. This means that
+    the observed frequency distribution of "wins" is significantly
+    different from the expected distribution, assuming that the expected
+    frequencies were based on the given probabilities.
+
+### Step 5. Does comparing the critical and test values provide the same result as comparing the p-value from R with the significance level?
+
+Yes, comparing the test statistic to the critical value effectively
+provides the same result as comparing the p-value to the significance
+level.
+
+The Chi-squared test statistic is 9989.5364, which is much greater than
+the critical value of 11.07049769. This would lead to reject the null
+hypothesis. The p-value is less than 0.00000000000000022204, which is
+certainly less than any conventional alpha level. This would also lead
+to reject the null hypothesis. Our overall conclusion in both situations
+is to reject the null hypothesis.
+
+------------------------------------------------------------------------
+
+### 9.4 Download and import the dataset
+
+```{r}
+# Reading the dataset
+crop_df <- read.csv("crop_data-3.csv")
+```
+
+### 9.5 Two-way ANOVA Test
+
+### Step 1. Stating the hypotheses and identify the claim
+
+The hypothesis for the above will be as follow:
+
+1.  **Main Effect of Density**:
+
+    -   Null Hypothesis: The mean response variable is the same across
+        different levels of density.
+
+    -   Alternative Hypothesis: The mean response variable differs
+        between at least two different levels of density.
+
+2.  **Main Effect of Fertilizer**:
+
+    -   Null Hypothesis: The mean response variable is the same across
+        different levels of fertilizer.
+
+    -   Alternative Hypothesis: The mean response variable differs
+        between at least two different levels of fertilizer.
+
+3.  **Interaction Effect of Density and Fertilizer**:
+
+    -   Null Hypothesis: There is no interaction effect between density
+        and fertilizer on the mean response variable; any effect of one
+        factor on the response variable is consistent at all levels of
+        the other factor.
+
+    -   Alternative Hypothesis: There is an interaction effect between
+        density and fertilizer on the mean response variable; the effect
+        of one factor on the response variable depends on the level of
+        the other factor.
+
+### Step 3. Computing the test results
+
+```{r}
+# Perform Two-way ANOVA
+anova_result_9.5 <- aov(yield ~ density * fertilizer, data = crop_df)
+
+# Display the ANOVA table
+summary(anova_result_9.5)
+```
+
+### Step 4. Analyzing the results
+
+1.  **Main Effect of Density**:
+
+    -   **Pr(\>F)**: 0.00018111, the p-value associated with the F
+        statistic. Since it's much lower than 0.05, there is a
+        statistically significant effect of plant density on the
+        response variable.
+
+2.  **Main Effect of Fertilizer**:
+
+    -   **Pr(\>F)**: 0.000079023, which is also well below 0.05,
+        indicating a statistically significant effect of the fertilizer
+        on the response variable.
+
+3.  **Interaction Effect of Density and Fertilizer**:
+
+    -   **Pr(\>F)**: 0.50563029, which is greater than 0.05, suggesting
+        that there is no statistically significant interaction effect
+        between plant density and fertilizer on the response variable.
+
+### Step 5. Summary
+
+-   The null hypothesis for the main effect of density is rejected
+    (there is a significant effect of density).
+
+-   The null hypothesis for the main effect of fertilizer is rejected
+    (there is a significant effect of fertilizer).
+
+-   The null hypothesis for the interaction effect of density and
+    fertilizer is not rejected (there is no significant interaction
+    effect).
+
+    ------------------------------------------------------------------------
+
+    # Conclusion:
+
+    Throughout the module, we observed the robustness of Chi-Square
+    testing and ANOVA in a variety of contexts---from healthcare and
+    aviation to entertainment and military demographics. In healthcare,
+    we evaluated if the distribution of blood types in a hospital
+    matched the general population. In aviation, we assessed an
+    airline's on-time performance against national statistics. For
+    entertainment, we explored the relationship between ethnicity and
+    movie admissions. In the military, we examined the association
+    between rank and military branch for female personnel. Finally, we
+    looked at sodium contents in food and sales among leading companies
+    to understand differences in means across groups.
+
+    In each task, the importance of matching the correct statistical
+    test to the research question at hand was evident. The ability to
+    interpret p-values and understand their relationship with alpha
+    levels was crucial in drawing appropriate conclusions. These
+    analyses, grounded in statistical theory, provide a foundation for
+    evidence-based decision-making, reinforcing the value of
+    quantitative reasoning in addressing complex questions.
+
+    ------------------------------------------------------------------------
+
+    # References:
+
+-   *OpenAI. (2021). ChatGPT (Version 3.5).
+    OpenAI.<https://chat.openai.com/>*
+
+-   F. E. (2020, July 30). *Two Way ANOVA in R*. YouTube.
+    <https://www.youtube.com/watch?v=oEaS_yKJ8lM>
